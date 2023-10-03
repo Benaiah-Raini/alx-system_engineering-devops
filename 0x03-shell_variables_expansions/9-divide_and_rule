@@ -1,0 +1,2 @@
+#!/bin/bash
+POWER=480 DIVIDE=10 echo $(( POWER / DIVIDE ))
