@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#Script displays all the contents of a directory in list format
+LIST=$(ls)
+for i in $LIST
+do
+    echo "$i" | cut -d '-' -f 2
+done
