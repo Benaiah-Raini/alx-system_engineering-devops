@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# installs apache in container and builds web page
+
+sudo apt -y install apache2
+sudo chown -R "$USER:$USER" /var/www/html/index.html
+sudo chmod -R 755 /var/www/html/index.html
+echo "Hello Holberton" > /var/www/html/index.html
+sudo sed -i "s/^Listen *$/Listen 80/" /etc/apache2/ports.conf
+sudo sed -i  "s/^<VirtualHost \*:*>/<VirtualHost *:80>/" /etc/apache2/sites-enabled/000-default.conf
+if pgrep -x apache2 > /dev/null
+then
+    sudo service apache2 restart
+else
+    sudo service apache2 start
+fi
