@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Configures nginx with new response headers
+
+apt-get update
+apt-get -y install nginx
+CONFIG=\
+"server {
+	 listen 80 default_server;
+         listen [::]:80 default_server;
+
+         root /var/www/html;
+         index index.html index.htm index.nginx-debian.html;
+         server_name _;
+         location / {
+         try_files \$uri \$uri/ =404;
+         }
+	 add_header X-Served-By \$hostname;
+         rewrite ^/redirect_me(.*)$ http://www.youtube.com/ permanent;
+	 }"
+echo -e "$CONFIG" > /etc/nginx/sites-enabled/default
+if [ "$(pgrep -x 'nginx' | wc -l)" -ge 1 ]
+then
+    service nginx restart
+else
+    service nginx start
+fi

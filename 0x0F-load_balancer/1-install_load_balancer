@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#Configuration for haproxy load balancer
+
+apt-get update
+apt-get -y install haproxy
+if [ "$(grep -q ENABLED < /etc/default/haproxy)" == "ENABLED" ]
+then
+	sed -iE "s/ENABLED=\(.*\)/ENABLED=1/g" /etc/default/haproxy
+else
+	echo "ENABLED=1" >> /etc/default/haproxy
+fi
+sed -iE "s/mode	\(.*\)/mode	tcp/g" /etc/haproxy/haproxy.cfg
+sed -iE "s/option\t\(.*\)/option\ttcplog/g" /etc/haproxy/haproxy.cfg
+BACKEND_CONFIG=\
+"
+backend nginx_pool
+	balance roundrobin
+	mode tcp
+	server 531613-web-01 54.236.16.198 check
+	server 531613-web-02 100.24.206.60 check
+"
+FRONTEND_CONFIG=\
+"
+frontend www
+	bind *:80
+	default_backend nginx_pool
+"
+echo -e "$FRONTEND_CONFIG" >> /etc/haproxy/haproxy.cfg
+echo -e "$BACKEND_CONFIG" >> /etc/haproxy/haproxy.cfg
+service haproxy restart
